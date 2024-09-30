@@ -41,13 +41,14 @@ def delete_task(task_id):
     return redirect(url_for('index'))
 
 # Route to mark a task as completed
-@app.route('/complete/<int:task_id>')
-def complete_task(task_id):
-    task = Task.query.get(task_id)
+@app.route('/complete/<task_title>')
+def complete_task(task_title):
+    task = Task.query.filter_by(title=task_title).first()
     if task:
         task.completed = not task.completed
         db.session.commit()
     return redirect(url_for('index'))
+
 
 if __name__ == '__main__':
     with app.app_context():
