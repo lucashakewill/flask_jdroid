@@ -32,7 +32,7 @@ def add_task():
     return redirect(url_for('index'))
 
 # Route to delete a task
-@app.route('/delete/<int:task_id>')
+@app.route('/delete/<int:task_id>', methods=['POST'])
 def delete_task(task_id):
     task = Task.query.get(task_id)
     if task:
