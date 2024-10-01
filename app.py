@@ -9,11 +9,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Initialize the database
 db = SQLAlchemy(app)
 
-# Create a Task model
+# Create a Task model with description field
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Boolean, default=False)
+    description = db.Column(db.Text, default="")  # New field to store markdown text
+
 
 # Route for the homepage
 @app.route('/')
@@ -31,6 +33,15 @@ def add_task():
         db.session.commit()
     return redirect(url_for('index'))
 
+@app.route('/update_description/<int:task_id>', methods=['POST'])
+def update_description(task_id):
+    task = Task.query.get(task_id)
+    if task:
+        task.description = request.form.get('description')
+        db.session.commit()
+    return redirect(url_for('index'))
+
+
 # Route to delete a task
 @app.route('/delete/<int:task_id>', methods=['POST'])
 def delete_task(task_id):
@@ -40,14 +51,17 @@ def delete_task(task_id):
         db.session.commit()
     return redirect(url_for('index'))
 
-# Route to mark a task as completed
-@app.route('/complete/<int:task_id>')
+@app.route('/complete/<int:task_id>', methods=['GET'])
 def complete_task(task_id):
     task = Task.query.get(task_id)
     if task:
-        task.completed = not task.completed
+        task.completed = not task.completed  # Toggle the completed status
         db.session.commit()
     return redirect(url_for('index'))
+
+
+
+
 
 if __name__ == '__main__':
     with app.app_context():
